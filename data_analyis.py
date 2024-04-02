@@ -20,6 +20,14 @@ def analyze_data(data):
         print("Summary Statistics:")
         print(data.describe())
 
+        
+        # One-hot encode categorical columns
+        categorical_cols = data.select_dtypes(include=['object']).columns
+        for col in categorical_cols:
+            encoded_cols = pd.get_dummies(data[col], prefix=col, drop_first=True)
+            data = pd.concat([data, encoded_cols], axis=1)
+            data.drop(col, axis=1, inplace=True)
+            
         # Plot histograms for numeric columns
         print("Histograms:")
         for col in data.select_dtypes(include=['int', 'float']):
@@ -28,11 +36,7 @@ def analyze_data(data):
             plt.xlabel(col)
             plt.ylabel('Frequency')
             plt.show()
-        categorical_cols = data.select_dtypes(include=['object']).columns
-        for col in categorical_cols:
-            encoded_cols = pd.get_dummies(data[col], prefix=col, drop_first=True)
-            data = pd.concat([data, encoded_cols], axis=1)
-            data.drop(col, axis=1, inplace=True)
+        
         # Plot bar plot for the class label (string type)
         class_label_counts = data['Class'].value_counts()
         class_label_counts.plot(kind='bar')
